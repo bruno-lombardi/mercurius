@@ -5,9 +5,12 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import ImageCarousel from "@/app/components/ImageCarousel";
 import PickupLocationMap from "@/app/components/PickupLocationMap";
-import { getProductById, products } from "@/app/data/products";
+import { getProductById, getProducts } from "@/lib/products";
+
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
+  const products = await getProducts();
   return products.map((product) => ({
     id: product.id,
   }));
@@ -19,14 +22,15 @@ export default async function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = getProductById(id);
+  const product = await getProductById(id);
 
   if (!product) {
     notFound();
   }
 
   // Get related products (same category, excluding current product)
-  const relatedProducts = products
+  const allProducts = await getProducts();
+  const relatedProducts = allProducts
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 3);
 
@@ -219,7 +223,7 @@ export default async function ProductPage({
                 <Link href={`/produto/${relatedProduct.id}`}>
                   <div className="relative rounded-lg overflow-hidden">
                     <Image
-                      src={relatedProduct.image}
+                      src={relatedProduct.image || relatedProduct.images[0]}
                       alt={relatedProduct.name}
                       width={400}
                       height={400}

@@ -2,9 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { products } from "./data/products";
+import { getProducts } from "@/lib/products";
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const products = await getProducts();
+
   return (
     <div className="bg-white text-gray-600">
       <Header />
@@ -63,7 +67,7 @@ export default function Home() {
                     className={`hover:scale-105 hover:shadow-lg transition-all duration-300 rounded-lg ${
                       product.sold ? "opacity-60" : ""
                     }`}
-                    src={product.image}
+                    src={product.image || product.images[0]}
                     alt={product.name}
                     width={400}
                     height={400}
