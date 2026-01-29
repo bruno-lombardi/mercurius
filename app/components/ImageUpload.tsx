@@ -212,18 +212,92 @@ export default function ImageUpload({
 
               {/* Badge da primeira imagem */}
               {index === 0 && (
-                <div className="absolute top-2 left-2 px-2 py-1 bg-neutral-900 text-white text-xs font-medium rounded">
+                <div className="absolute top-2 left-2 px-2 py-1 bg-neutral-900 text-white text-xs font-medium rounded z-10">
                   Principal
                 </div>
               )}
 
-              {/* Overlay com ações */}
-              <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center gap-2">
+              {/* Overlay com ações - desktop (hover no centro) */}
+              <div className="hidden md:flex absolute inset-0 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 items-center justify-center gap-2">
                 {/* Botões de reordenar */}
                 {index > 0 && (
                   <button
+                    type="button"
                     onClick={() => moveImage(index, index - 1)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-neutral-100"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-neutral-100 shadow-lg"
+                    title="Mover para esquerda"
+                  >
+                    <svg
+                      className="w-5 h-5 text-neutral-900"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                  </button>
+                )}
+
+                {/* Botão remover */}
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-10 h-10 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-700 shadow-lg"
+                  title="Remover imagem"
+                >
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+
+                {/* Botão mover para direita */}
+                {index < images.length - 1 && (
+                  <button
+                    type="button"
+                    onClick={() => moveImage(index, index + 1)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-neutral-100 shadow-lg"
+                    title="Mover para direita"
+                  >
+                    <svg
+                      className="w-5 h-5 text-neutral-900"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              {/* Botões mobile - fixos na parte inferior */}
+              <div className="md:hidden absolute bottom-2 left-2 right-2 flex items-center justify-center gap-2">
+                {/* Botão mover para esquerda */}
+                {index > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => moveImage(index, index - 1)}
+                    className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg"
                     title="Mover para esquerda"
                   >
                     <svg
@@ -244,8 +318,9 @@ export default function ImageUpload({
 
                 {/* Botão remover */}
                 <button
+                  type="button"
                   onClick={() => removeImage(index)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-700"
+                  className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shadow-lg"
                   title="Remover imagem"
                 >
                   <svg
@@ -266,8 +341,9 @@ export default function ImageUpload({
                 {/* Botão mover para direita */}
                 {index < images.length - 1 && (
                   <button
+                    type="button"
                     onClick={() => moveImage(index, index + 1)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-neutral-100"
+                    className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg"
                     title="Mover para direita"
                   >
                     <svg
