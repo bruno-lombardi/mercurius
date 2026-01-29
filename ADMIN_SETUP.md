@@ -28,7 +28,7 @@ NEXTAUTH_SECRET=sua-chave-secreta-aqui
 
 # Admin Credentials
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD_HASH=$2a$10$rBV2Oe4Y7qYs5gYJvXvDLOrQ3uVKZk8PxvVHN4dqvX/H4L.QqmwVa
+ADMIN_PASSWORD_HASH=xxxxxxxxxxxxxxxxx
 ```
 
 ### 3. Gerar Hash de Senha Personalizada
