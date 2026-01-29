@@ -1,41 +1,20 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import ProductEditForm from "./ProductEditForm";
+import ProductNewForm from "./ProductNewForm";
 import Link from "next/link";
-import { getProductById } from "@/lib/products";
 import type { Metadata } from "next";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
-  const { id } = await params;
-  const product = await getProductById(id);
+export const metadata: Metadata = {
+  title: "Novo Produto - Admin",
+  description: "Adicionar novo produto ao catálogo",
+};
 
-  if (!product) {
-    return {
-      title: "Produto não encontrado - Admin",
-    };
-  }
-
-  return {
-    title: `Editar ${product.name} - Admin`,
-  };
-}
-
-export default async function EditProductPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function NewProductPage() {
   const session = await auth();
 
   if (!session) {
     redirect("/admin/login");
   }
-
-  const { id } = await params;
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -52,10 +31,10 @@ export default async function EditProductPage({
             </Link>
             <div>
               <h1 className="text-2xl font-light text-neutral-900 tracking-tight">
-                Editar Produto
+                Novo Produto
               </h1>
               <p className="text-sm text-neutral-500 mt-1">
-                Atualize as informações e imagens do produto
+                Adicione um novo produto ao catálogo
               </p>
             </div>
           </div>
@@ -63,7 +42,7 @@ export default async function EditProductPage({
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ProductEditForm productId={id} />
+        <ProductNewForm />
       </main>
     </div>
   );

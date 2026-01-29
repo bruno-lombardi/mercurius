@@ -1,5 +1,6 @@
 import clientPromise from '@/lib/mongodb';
 import type { Product } from '@/types/product';
+import { ObjectId } from 'mongodb';
 
 // Função auxiliar para buscar produtos da API
 export async function getProducts(): Promise<Product[]> {
@@ -12,7 +13,6 @@ export async function getProducts(): Promise<Product[]> {
       .find({})
       .sort({ createdAt: -1 })
       .toArray();
-
     // Converte ObjectId para string para serialização
     return products.map((product) => ({
       ...product,
@@ -30,9 +30,10 @@ export async function getProductById(id: string): Promise<Product | null> {
     const client = await clientPromise;
     const db = client.db('mercurius');
     
+    // Busca por _id (ObjectId)
     const product = await db
       .collection('products')
-      .findOne({ id });
+      .findOne({ _id: new ObjectId(id) });
 
     if (!product) {
       return null;
@@ -41,6 +42,7 @@ export async function getProductById(id: string): Promise<Product | null> {
     return {
       ...product,
       _id: product._id.toString(),
+      image: product.images?.[0], // Primeiro imagem como principal
     } as Product;
   } catch (error) {
     console.error('Error fetching product:', error);

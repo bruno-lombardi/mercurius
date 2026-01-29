@@ -1,4 +1,11 @@
+"use client";
+
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+
 export default function Footer() {
+  const { data: session } = useSession();
+
   return (
     <footer className=" bg-white py-8 border-t border-gray-400">
       <div className="flex justify-center">
@@ -20,7 +27,7 @@ export default function Footer() {
                 <h3 className="text-left font-bold text-gray-900">Contato</h3>
                 <div className="py-4 mt-0">
                   <a
-                    href="https://wa.me/5511999999999"
+                    href="https://wa.me/5511957706296"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-gray-900 hover:text-green-600 transition-colors"
@@ -34,6 +41,21 @@ export default function Footer() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Admin Button */}
+      <div className="border-t border-gray-200 pt-6 mt-4">
+        <div className="container mx-auto px-6 flex justify-center">
+          <Link
+            href={session ? "/admin/dashboard" : "/admin/login"}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all group"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span>{session ? "Dashboard" : "Painel Administrativo"}</span>
+          </Link>
         </div>
       </div>
     </footer>

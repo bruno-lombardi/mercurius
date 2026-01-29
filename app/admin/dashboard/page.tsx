@@ -4,6 +4,13 @@ import { getProducts } from "@/lib/products";
 import Link from "next/link";
 import Image from "next/image";
 import LogoutButton from "./LogoutButton";
+import DeleteProductButton from "./DeleteProductButton";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard - Admin",
+  description: "Painel de administração de produtos",
+};
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -137,7 +144,7 @@ export default async function DashboardPage() {
           <div className="block sm:hidden">
             {products.map((product) => (
               <div
-                key={product.id}
+                key={product._id}
                 className="border-b border-neutral-200 last:border-b-0 p-4 hover:bg-neutral-50 transition-colors duration-200"
               >
                 <div className="flex gap-4">
@@ -151,7 +158,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-neutral-900 truncate">
-                      {product.name}
+                      {product.name} {product._id}
                     </h3>
                     <p className="text-sm text-neutral-500 mt-0.5">
                       {product.category}
@@ -178,12 +185,18 @@ export default async function DashboardPage() {
                         Editar
                       </Link>
                       <Link
-                        href={`/produto/${product.id}`}
+                        href={`/produto/${product._id}`}
                         target="_blank"
                         className="flex-1 inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors duration-200"
                       >
                         Ver
                       </Link>
+                      <div className="inline-flex items-center justify-center px-3 py-1.5 border border-neutral-300 rounded-lg bg-white">
+                        <DeleteProductButton
+                          productId={product._id?.toString() || ""}
+                          productName={product.name}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -216,7 +229,7 @@ export default async function DashboardPage() {
               <tbody className="bg-white divide-y divide-neutral-200">
                 {products.map((product) => (
                   <tr
-                    key={product.id}
+                    key={product._id}
                     className="hover:bg-neutral-50 transition-colors duration-150"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -256,26 +269,32 @@ export default async function DashboardPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link
-                        href={`/admin/products/${product._id}/edit`}
-                        className="inline-flex items-center text-neutral-700 hover:text-neutral-900 transition-colors duration-200 mr-4"
-                      >
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        Editar
-                      </Link>
-                      <Link
-                        href={`/produto/${product.id}`}
-                        target="_blank"
-                        className="inline-flex items-center text-neutral-700 hover:text-neutral-900 transition-colors duration-200"
-                      >
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        Ver
-                      </Link>
+                      <div className="flex items-center justify-end gap-4">
+                        <Link
+                          href={`/admin/products/${product._id}/edit`}
+                          className="inline-flex items-center text-neutral-700 hover:text-neutral-900 transition-colors duration-200"
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          Editar
+                        </Link>
+                        <Link
+                          href={`/produto/${product._id}`}
+                          target="_blank"
+                          className="inline-flex items-center text-neutral-700 hover:text-neutral-900 transition-colors duration-200"
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          Ver
+                        </Link>
+                        <DeleteProductButton
+                          productId={product._id?.toString() || ""}
+                          productName={product.name}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -11,17 +11,10 @@ export async function GET(
     const client = await clientPromise;
     const db = client.db('mercurius');
     
-    // Tenta buscar por ObjectId ou por id customizado
-    let product;
-    try {
-      product = await db
-        .collection('products')
-        .findOne({ _id: new ObjectId(id) });
-    } catch {
-      product = await db
-        .collection('products')
-        .findOne({ id });
-    }
+    // Busca por ObjectId
+    const product = await db
+      .collection('products')
+      .findOne({ _id: new ObjectId(id) });
 
     if (!product) {
       return NextResponse.json(
@@ -120,9 +113,15 @@ export async function PATCH(
       );
     }
 
+    // Buscar e retornar o produto atualizado
+    const updatedProduct = await db
+      .collection('products')
+      .findOne({ _id: new ObjectId(id) });
+
     return NextResponse.json({ 
       success: true, 
-      message: 'Product updated successfully' 
+      message: 'Product updated successfully',
+      data: updatedProduct
     });
   } catch (error) {
     console.error('Error updating product:', error);

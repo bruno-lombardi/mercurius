@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Work_Sans } from "next/font/google";
 import "./globals.css";
+import AuthSessionProvider from "./components/SessionProvider";
 
 const workSans = Work_Sans({
   weight: ["200", "400", "600", "700"],
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${workSans.variable} font-sans antialiased bg-white text-gray-600`}>
-        {children}
+        <AuthSessionProvider>
+          {children}
+        </AuthSessionProvider>
       </body>
     </html>
   );

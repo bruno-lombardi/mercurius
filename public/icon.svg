@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background with rounded corners -->
+  <rect width="512" height="512" rx="90" fill="#22c55e"/>
+  
+  <!-- House icon in white (centered and larger) -->
+  <g fill="#ffffff">
+    <!-- Roof - simple triangle -->
+    <path d="M 256 100 L 420 260 L 92 260 Z"/>
+    
+    <!-- House body -->
+    <rect x="100" y="260" width="312" height="220" rx="8"/>
+    
+    <!-- Door -->
+    <rect x="210" y="340" width="92" height="140" fill="#1a7a3e" rx="8"/>
+    <circle cx="280" cy="410" r="8" fill="#ffffff"/>
+    
+    <!-- Left window -->
+    <g>
+      <rect x="130" y="300" width="70" height="70" fill="#1a7a3e" rx="8"/>
+      <line x1="130" y1="335" x2="200" y2="335" stroke="#ffffff" stroke-width="4"/>
+      <line x1="165" y1="300" x2="165" y2="370" stroke="#ffffff" stroke-width="4"/>
+    </g>
+    
+    <!-- Right window -->
+    <g>
+      <rect x="312" y="300" width="70" height="70" fill="#1a7a3e" rx="8"/>
+      <line x1="312" y1="335" x2="382" y2="335" stroke="#ffffff" stroke-width="4"/>
+      <line x1="347" y1="300" x2="347" y2="370" stroke="#ffffff" stroke-width="4"/>
+    </g>
+  </g>
+</svg>

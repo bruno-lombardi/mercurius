@@ -33,7 +33,7 @@ export async function generateMetadata({
 export async function generateStaticParams() {
   const products = await getProducts();
   return products.map((product) => ({
-    id: product.id,
+    id: product._id,
   }));
 }
 
@@ -52,7 +52,7 @@ export default async function ProductPage({
   // Get related products (same category, excluding current product)
   const allProducts = await getProducts();
   const relatedProducts = allProducts
-    .filter((p) => p.category === product.category && p.id !== product.id)
+    .filter((p) => p.category === product.category && p._id !== product._id)
     .slice(0, 3);
 
   return (
@@ -76,24 +76,26 @@ export default async function ProductPage({
           {/* Product Image Carousel */}
           <div className="w-full md:w-1/2 px-4 mb-8">
             <ImageCarousel images={product.images} productName={product.name} />
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                Deslize para ver mais fotos
-              </p>
-            </div>
+            {product.images.length > 1 && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600 flex items-center gap-2">
+                  <svg
+                    className="w-5 h-5 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Deslize para ver mais fotos
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -177,7 +179,7 @@ export default async function ProductPage({
             <div className="flex gap-4">
               {!product.sold ? (
                 <a
-                  href={`https://wa.me/5511999999999?text=Olá! Tenho interesse no produto: ${product.name}`}
+                  href={`https://wa.me/5511957706296?text=Olá! Tenho interesse no produto: ${product.name}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
@@ -238,10 +240,10 @@ export default async function ProductPage({
           <div className="flex flex-wrap -mx-4">
             {relatedProducts.map((relatedProduct) => (
               <div
-                key={relatedProduct.id}
+                key={relatedProduct._id}
                 className="w-full md:w-1/3 px-4 mb-8"
               >
-                <Link href={`/produto/${relatedProduct.id}`}>
+                <Link href={`/produto/${relatedProduct._id}`}>
                   <div className="relative rounded-lg overflow-hidden">
                     <Image
                       src={relatedProduct.image || relatedProduct.images[0]}

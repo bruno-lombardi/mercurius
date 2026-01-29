@@ -3,8 +3,14 @@ import Link from "next/link";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { getProducts } from "@/lib/products";
+import type { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: "Mercurius - Móveis e Eletrodomésticos de Qualidade",
+  description: "Encontre móveis e eletrodomésticos de qualidade em excelente estado. Retirada em São Paulo.",
+};
 
 export default async function Home() {
   const products = await getProducts();
@@ -58,10 +64,10 @@ export default async function Home() {
           {/* Product Cards */}
           {products.map((product) => (
             <div
-              key={product.id}
+              key={product._id}
               className="w-full md:w-1/3 xl:w-1/4 p-6 flex flex-col"
             >
-              <Link href={`/produto/${product.id}`}>
+              <Link href={`/produto/${product._id}`}>
                 <div className="relative">
                   <Image
                     className={`hover:scale-105 hover:shadow-lg transition-all duration-300 rounded-lg ${

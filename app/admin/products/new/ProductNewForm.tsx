@@ -1,41 +1,16 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { Product } from "@/types/product";
 import ImageUpload from "@/app/components/ImageUpload";
 
-export default function ProductEditForm({ productId }: { productId: string }) {
-  const [loading, setLoading] = useState(true);
+export default function ProductNewForm() {
+  const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState(false);
-  const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<string[]>([]);
-
-  useEffect(() => {
-    async function loadProduct() {
-      try {
-        const response = await fetch(`/api/products/${productId}`);
-        const data = await response.json();
-
-        if (!data.success) {
-          setError("Produto não encontrado");
-          return;
-        }
-
-        setProduct(data.data);
-        setImages(data.data.images || []);
-      } catch (err) {
-        console.error(err);
-        setError("Erro ao carregar produto");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadProduct();
-  }, [productId]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,7 +20,7 @@ export default function ProductEditForm({ productId }: { productId: string }) {
 
     const formData = new FormData(event.currentTarget);
 
-    const updatedProduct = {
+    const newProduct = {
       name: formData.get("name") as string,
       price: parseFloat(formData.get("price") as string),
       description: formData.get("description") as string,
@@ -53,63 +28,34 @@ export default function ProductEditForm({ productId }: { productId: string }) {
       condition: formData.get("condition") as string,
       dimensions: formData.get("dimensions") as string,
       images: images,
-      sold: formData.get("sold") === "on",
+      sold: false,
     };
 
     try {
-      const response = await fetch(`/api/products/${productId}`, {
-        method: "PATCH",
+      const response = await fetch("/api/products", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedProduct),
+        body: JSON.stringify(newProduct),
       });
 
       const data = await response.json();
 
       if (!data.success) {
-        setError(data.error || "Erro ao atualizar produto");
+        setError(data.error || "Erro ao criar produto");
         return;
       }
 
       setSuccess(true);
-      // Atualizar os dados do produto sem redirecionar
-      if (data.data) {
-        setProduct(data.data);
-        setImages(data.data.images || []);
-      }
-      
-      // Limpar mensagem de sucesso após 3 segundos
       setTimeout(() => {
-        setSuccess(false);
-      }, 3000);
+        router.push("/admin/dashboard");
+        router.refresh();
+      }, 1500);
     } catch (err) {
       console.error(err);
-      setError("Erro ao atualizar produto");
+      setError("Erro ao criar produto");
     } finally {
       setSaving(false);
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex flex-col justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-900"></div>
-        <p className="mt-4 text-sm text-neutral-500">Carregando produto...</p>
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-        <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <div>
-          <h3 className="text-sm font-medium text-red-800">Erro ao carregar produto</h3>
-          <p className="text-sm text-red-700 mt-1">{error || "Produto não encontrado"}</p>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -133,7 +79,7 @@ export default function ProductEditForm({ productId }: { productId: string }) {
           </svg>
           <div>
             <h3 className="text-sm font-medium text-green-800">Sucesso!</h3>
-            <p className="text-sm text-green-700 mt-1">Produto atualizado.</p>
+            <p className="text-sm text-green-700 mt-1">Produto criado. Redirecionando...</p>
           </div>
         </div>
       )}
@@ -153,7 +99,6 @@ export default function ProductEditForm({ productId }: { productId: string }) {
                   id="name"
                   name="name"
                   required
-                  defaultValue={product.name}
                   className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors"
                   placeholder="Ex: Sofá Retrátil 3 Lugares"
                 />
@@ -170,7 +115,6 @@ export default function ProductEditForm({ productId }: { productId: string }) {
                     name="price"
                     step="0.01"
                     required
-                    defaultValue={product.price}
                     className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors"
                     placeholder="0.00"
                   />
@@ -185,7 +129,6 @@ export default function ProductEditForm({ productId }: { productId: string }) {
                     id="category"
                     name="category"
                     required
-                    defaultValue={product.category}
                     className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors"
                     placeholder="Ex: Móveis, Eletrodomésticos"
                   />
@@ -201,7 +144,6 @@ export default function ProductEditForm({ productId }: { productId: string }) {
                   name="description"
                   rows={4}
                   required
-                  defaultValue={product.description}
                   className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors resize-none"
                   placeholder="Descreva o produto, suas características e estado..."
                 />
@@ -221,7 +163,6 @@ export default function ProductEditForm({ productId }: { productId: string }) {
                   type="text"
                   id="condition"
                   name="condition"
-                  defaultValue={product.condition}
                   placeholder="Ex: Excelente, Bom, Regular"
                   className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors"
                 />
@@ -235,7 +176,6 @@ export default function ProductEditForm({ productId }: { productId: string }) {
                   type="text"
                   id="dimensions"
                   name="dimensions"
-                  defaultValue={product.dimensions}
                   placeholder="Ex: 120 x 80 x 45 cm"
                   className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors"
                 />
@@ -250,28 +190,6 @@ export default function ProductEditForm({ productId }: { productId: string }) {
               Faça upload de até 5 imagens. A primeira será a imagem principal.
             </p>
             <ImageUpload images={images} onChange={setImages} maxImages={5} />
-          </div>
-
-          {/* Status */}
-          <div className="pt-6 border-t border-neutral-200">
-            <h3 className="text-lg font-medium text-neutral-900 mb-4">Status de Venda</h3>
-            <div className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                id="sold"
-                name="sold"
-                defaultChecked={product.sold}
-                className="mt-1 h-4 w-4 text-neutral-900 focus:ring-neutral-900 border-neutral-300 rounded"
-              />
-              <div>
-                <label htmlFor="sold" className="block text-sm font-medium text-neutral-900">
-                  Marcar como vendido
-                </label>
-                <p className="text-sm text-neutral-500 mt-0.5">
-                  O produto não aparecerá mais na lista de disponíveis
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -288,14 +206,14 @@ export default function ProductEditForm({ productId }: { productId: string }) {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Salvando...
+                Criando...
               </>
             ) : (
               <>
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Salvar Alterações
+                Criar Produto
               </>
             )}
           </button>

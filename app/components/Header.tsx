@@ -77,7 +77,7 @@ export default function Header() {
         <div className="order-2 md:order-3 flex items-center">
           <a
             className="inline-block no-underline hover:text-black"
-            href="https://wa.me/5511999999999"
+            href="https://wa.me/5511957706296"
             target="_blank"
             rel="noopener noreferrer"
           >
