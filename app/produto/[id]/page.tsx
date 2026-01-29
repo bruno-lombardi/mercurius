@@ -6,8 +6,29 @@ import Footer from "@/app/components/Footer";
 import ImageCarousel from "@/app/components/ImageCarousel";
 import PickupLocationMap from "@/app/components/PickupLocationMap";
 import { getProductById, getProducts } from "@/lib/products";
+import type { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProductById(id);
+
+  if (!product) {
+    return {
+      title: "Produto não encontrado",
+    };
+  }
+
+  return {
+    title: `${product.name} - R$ ${product.price.toLocaleString("pt-BR")}`,
+    description: product.description,
+  };
+}
 
 export async function generateStaticParams() {
   const products = await getProducts();
@@ -145,7 +166,7 @@ export default async function ProductPage({
               <h2 className="text-xl font-semibold text-gray-900 mb-3">
                 Descrição
               </h2>
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
                 {product.description}
               </p>
             </div>

@@ -11,9 +11,17 @@ export async function GET(
     const client = await clientPromise;
     const db = client.db('mercurius');
     
-    const product = await db
-      .collection('products')
-      .findOne({ _id: new ObjectId(id) });
+    // Tenta buscar por ObjectId ou por id customizado
+    let product;
+    try {
+      product = await db
+        .collection('products')
+        .findOne({ _id: new ObjectId(id) });
+    } catch {
+      product = await db
+        .collection('products')
+        .findOne({ id });
+    }
 
     if (!product) {
       return NextResponse.json(
@@ -24,7 +32,7 @@ export async function GET(
 
     return NextResponse.json({ 
       success: true, 
-      data: product 
+      data: { ...product, _id: product._id.toString() }
     });
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -56,6 +64,53 @@ export async function PUT(
       .updateOne(
         { _id: new ObjectId(id) },
         { $set: updateData }
+      );
+
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Product not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Product updated successfully' 
+    });
+  } catch (error) {
+    console.error('Error updating product:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to update product' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const client = await clientPromise;
+    const db = client.db('mercurius');
+    
+    const body = await request.json();
+    
+    // Remove _id do body se existir
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { _id, ...updateData } = body;
+    
+    const result = await db
+      .collection('products')
+      .updateOne(
+        { _id: new ObjectId(id) },
+        { 
+          $set: {
+            ...updateData,
+            updatedAt: new Date(),
+          }
+        }
       );
 
     if (result.matchedCount === 0) {
