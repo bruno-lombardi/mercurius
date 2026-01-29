@@ -8,8 +8,8 @@ import type { Metadata } from "next";
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: "Mercurius - Móveis e Eletrodomésticos de Qualidade",
-  description: "Encontre móveis e eletrodomésticos de qualidade em excelente estado. Retirada em São Paulo.",
+  title: "Vendendo Tudo - Móveis e Eletrodomésticos em São Paulo",
+  description: "Estou de mudança e criei essa página para divulgar móveis e eletrodomésticos dos quais estou me desfazendo. Retirada em Jundiaí - São Paulo.",
 };
 
 export default async function Home() {
