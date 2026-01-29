@@ -2,6 +2,7 @@ export interface Product {
   _id?: string;
   name: string;
   price: number;
+  discount?: number; // Desconto em porcentagem (0-100)
   description: string;
   category: string;
   images: string[];

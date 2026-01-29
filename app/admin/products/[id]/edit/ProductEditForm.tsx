@@ -4,6 +4,7 @@ import { useEffect, useState, FormEvent } from "react";
 import Link from "next/link";
 import type { Product } from "@/types/product";
 import ImageUpload from "@/app/components/ImageUpload";
+import PriceDisplay from "@/app/components/PriceDisplay";
 
 export default function ProductEditForm({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(true);
@@ -12,6 +13,8 @@ export default function ProductEditForm({ productId }: { productId: string }) {
   const [success, setSuccess] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
   const [images, setImages] = useState<string[]>([]);
+  const [previewPrice, setPreviewPrice] = useState<number>(0);
+  const [previewDiscount, setPreviewDiscount] = useState<number>(0);
 
   useEffect(() => {
     async function loadProduct() {
@@ -26,6 +29,8 @@ export default function ProductEditForm({ productId }: { productId: string }) {
 
         setProduct(data.data);
         setImages(data.data.images || []);
+        setPreviewPrice(data.data.price || 0);
+        setPreviewDiscount(data.data.discount || 0);
       } catch (err) {
         console.error(err);
         setError("Erro ao carregar produto");
@@ -48,6 +53,7 @@ export default function ProductEditForm({ productId }: { productId: string }) {
     const updatedProduct = {
       name: formData.get("name") as string,
       price: parseFloat(formData.get("price") as string),
+      discount: formData.get("discount") ? parseFloat(formData.get("discount") as string) : undefined,
       description: formData.get("description") as string,
       category: formData.get("category") as string,
       condition: formData.get("condition") as string,
@@ -171,25 +177,60 @@ export default function ProductEditForm({ productId }: { productId: string }) {
                     step="0.01"
                     required
                     defaultValue={product.price}
+                    onChange={(e) => setPreviewPrice(parseFloat(e.target.value) || 0)}
                     className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors"
                     placeholder="0.00"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-neutral-700 mb-2">
-                    Categoria *
+                  <label htmlFor="discount" className="block text-sm font-medium text-neutral-700 mb-2">
+                    Desconto (%)
                   </label>
                   <input
-                    type="text"
-                    id="category"
-                    name="category"
-                    required
-                    defaultValue={product.category}
+                    type="number"
+                    id="discount"
+                    name="discount"
+                    min="0"
+                    max="100"
+                    step="1"
+                    defaultValue={product.discount || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setPreviewDiscount(value === '' ? 0 : parseFloat(value) || 0);
+                    }}
                     className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors"
-                    placeholder="Ex: Móveis, Eletrodomésticos"
+                    placeholder="0"
+                  />
+                  <p className="mt-1 text-xs text-neutral-500">Deixe em branco para nenhum desconto</p>
+                </div>
+              </div>
+
+              {/* Preview do Preço */}
+              {previewPrice > 0 && (
+                <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+                  <p className="text-xs font-medium text-neutral-600 mb-2">Preview do Preço:</p>
+                  <PriceDisplay 
+                    price={previewPrice} 
+                    discount={previewDiscount > 0 ? previewDiscount : undefined}
+                    size="medium"
                   />
                 </div>
+              )}
+
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-neutral-700 mb-2">
+                  Categoria *
+                </label>
+                <input
+                  type="text"
+                  id="category"
+                  name="category"
+                  required
+                  defaultValue={product.category}
+                  className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors"
+                  placeholder="Ex: Móveis, Eletrodomésticos"
+                />
               </div>
 
               <div>

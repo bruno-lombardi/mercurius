@@ -163,9 +163,16 @@ export default async function DashboardPage() {
                     <p className="text-sm text-neutral-500 mt-0.5">
                       {product.category}
                     </p>
-                    <p className="text-lg font-light text-neutral-900 mt-1">
-                      R$ {product.price.toLocaleString("pt-BR")}
-                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-lg font-light text-neutral-900">
+                        R$ {product.price.toLocaleString("pt-BR")}
+                      </p>
+                      {product.discount && product.discount > 0 && (
+                        <span className="text-xs font-bold bg-green-500 text-white px-2 py-0.5 rounded">
+                          -{product.discount}%
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 mt-2">
                       {product.sold ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600">
@@ -253,9 +260,16 @@ export default async function DashboardPage() {
                       <span className="text-sm text-neutral-500">{product.category}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-neutral-900">
-                        R$ {product.price.toLocaleString("pt-BR")}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-neutral-900">
+                          R$ {product.price.toLocaleString("pt-BR")}
+                        </span>
+                        {product.discount && product.discount > 0 && (
+                          <span className="text-xs font-bold bg-green-500 text-white px-2 py-0.5 rounded">
+                            -{product.discount}%
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {product.sold ? (

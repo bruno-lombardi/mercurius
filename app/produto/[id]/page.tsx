@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import PriceDisplay from "@/app/components/PriceDisplay";
 import ImageCarousel from "@/app/components/ImageCarousel";
 import PickupLocationMap from "@/app/components/PickupLocationMap";
 import { getProductById, getProducts } from "@/lib/products";
@@ -120,12 +121,18 @@ export default async function ProductPage({
               {product.name}
             </h1>
 
-            <div className="flex items-center mb-6">
-              <span
-                className={`text-4xl font-bold ${product.sold ? "text-gray-500 line-through" : "text-gray-900"}`}
-              >
-                R$ {product.price.toLocaleString("pt-BR")}
-              </span>
+            <div className="mb-6">
+              {product.sold ? (
+                <span className="text-4xl font-bold text-gray-500 line-through">
+                  R$ {product.price.toLocaleString("pt-BR")}
+                </span>
+              ) : (
+                <PriceDisplay 
+                  price={product.price} 
+                  discount={product.discount}
+                  size="large"
+                />
+              )}
             </div>
 
             <div className="mb-6">

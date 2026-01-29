@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Work_Sans } from "next/font/google";
 import "./globals.css";
 import AuthSessionProvider from "./components/SessionProvider";
+import { Analytics } from '@vercel/analytics/next';
 
 const workSans = Work_Sans({
   weight: ["200", "400", "600", "700"],
@@ -25,6 +26,7 @@ export default function RootLayout({
         <AuthSessionProvider>
           {children}
         </AuthSessionProvider>
+        <Analytics />
       </body>
     </html>
   );
