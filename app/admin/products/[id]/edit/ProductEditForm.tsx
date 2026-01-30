@@ -62,9 +62,14 @@ export default function ProductEditForm({ productId }: { productId: string }) {
       sold: formData.get("sold") === "on",
     };
 
+    // Decide entre PUT e PATCH: se o nome mudou, usamos PUT (gera/atualiza slug e revalida cache).
+    const originalName = product?.name || "";
+    const nameChanged = (updatedProduct.name || "").trim() !== originalName.trim();
+    const method = nameChanged ? "PUT" : "PATCH";
+
     try {
       const response = await fetch(`/api/products/${productId}`, {
-        method: "PATCH",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedProduct),
       });
@@ -77,12 +82,28 @@ export default function ProductEditForm({ productId }: { productId: string }) {
       }
 
       setSuccess(true);
-      // Atualizar os dados do produto sem redirecionar
-      if (data.data) {
-        setProduct(data.data);
-        setImages(data.data.images || []);
+
+      // Se usamos PATCH o endpoint já retorna o produto atualizado em data.data
+      if (method === "PATCH") {
+        if (data.data) {
+          setProduct(data.data);
+          setImages(data.data.images || []);
+        }
+      } else {
+        // PUT retorna apenas sucesso + slug; re-fetch o produto para atualizar o estado local
+        try {
+          const refetch = await fetch(`/api/products/${productId}`);
+          const refetchJson = await refetch.json();
+          if (refetchJson.success) {
+            setProduct(refetchJson.data);
+            setImages(refetchJson.data.images || []);
+          }
+        } catch (refetchErr) {
+          // não falha a submissão por conta do re-fetch
+          console.warn("Falha ao refetch o produto após PUT:", refetchErr);
+        }
       }
-      
+
       // Limpar mensagem de sucesso após 3 segundos
       setTimeout(() => {
         setSuccess(false);
