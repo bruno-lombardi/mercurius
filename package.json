@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "migrate": "dotenvx run --env-file=.env.local -- tsx scripts/migrate-products.ts",
+    "add-slugs": "dotenvx run --env-file=.env.local -- tsx scripts/add-slugs-to-products.ts",
     "generate-password": "tsx scripts/generate-password-hash.ts",
     "test-password": "dotenvx run --env-file=.env.local -- tsx scripts/test-password.ts",
     "setup-admin": "dotenvx run --env-file=.env.local -- tsx scripts/setup-admin.ts",

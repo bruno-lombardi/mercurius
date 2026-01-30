@@ -1,12 +1,11 @@
-import Image from "next/image";
-import Link from "next/link";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import PriceDisplay from "./components/PriceDisplay";
+import ProductGrid from "./components/ProductGrid";
 import { getProducts } from "@/lib/products";
 import type { Metadata } from "next";
 
-export const dynamic = 'force-dynamic';
+// Revalida a cada 30 segundos (ISR)
+export const revalidate = 30;
 
 export const metadata: Metadata = {
   title: "Vendendo Tudo - Móveis e Eletrodomésticos em São Paulo",
@@ -36,7 +35,7 @@ export default async function Home() {
           Móveis e Eletrodomésticos
         </h1>
         <p className="text-xl text-white mb-4">
-          Produtos de qualidade por preços justos
+          Vendo diversos itens em ótimo estado.
         </p>
         <a
           className="text-xl inline-block no-underline border-b-2 border-white leading-relaxed text-white hover:text-black hover:bg-white hover:border-black px-2 transition-all duration-300 ease-in-out active:scale-95"
@@ -50,7 +49,7 @@ export default async function Home() {
 
       {/* Products Grid */}
       <section className="bg-white py-8" id="produtos">
-        <div className="container mx-auto flex items-center flex-wrap pt-4 pb-12">
+        <div className="container mx-auto pt-4">
           <nav className="w-full z-30 top-0 px-6 py-1">
             <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-2 py-3">
               <a
@@ -62,92 +61,7 @@ export default async function Home() {
             </div>
           </nav>
 
-          {/* Product Cards */}
-          {products.map((product) => (
-            <div
-              key={product._id}
-              className="w-full md:w-1/3 xl:w-1/4 p-6 flex flex-col"
-            >
-              <Link href={`/produto/${product._id}`}>
-                <div className="relative">
-                  <Image
-                    className={`hover:scale-105 hover:shadow-lg transition-all duration-300 rounded-lg ${
-                      product.sold ? "opacity-60" : ""
-                    }`}
-                    src={product.image || product.images[0]}
-                    alt={product.name}
-                    width={400}
-                    height={400}
-                    style={{ objectFit: "cover", aspectRatio: "1/1" }}
-                  />
-                  <span className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-xs font-semibold text-gray-700">
-                    {product.category}
-                  </span>
-                  
-                  {/* Sold Badge */}
-                  {product.sold && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold text-lg shadow-lg transform rotate-[-5deg]">
-                        VENDIDO
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="pt-3 flex items-center justify-between">
-                  <p className={`font-semibold ${product.sold ? "text-gray-500 line-through" : "text-gray-900"}`}>
-                    {product.name}
-                  </p>
-                  <svg
-                    className="h-6 w-6 fill-current text-gray-500 hover:text-black"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12,4.595c-1.104-1.006-2.512-1.558-3.996-1.558c-1.578,0-3.072,0.623-4.213,1.758c-2.353,2.363-2.352,6.059,0.002,8.412 l7.332,7.332c0.17,0.299,0.498,0.492,0.875,0.492c0.322,0,0.609-0.163,0.792-0.409l7.415-7.415 c2.354-2.354,2.354-6.049-0.002-8.416c-1.137-1.131-2.631-1.754-4.209-1.754C14.513,3.037,13.104,3.589,12,4.595z M18.791,6.205 c1.563,1.571,1.564,4.025,0.002,5.588L12,18.586l-6.793-6.793C3.645,10.23,3.646,7.776,5.205,6.209 c0.76-0.756,1.754-1.172,2.799-1.172s2.035,0.416,2.789,1.17l0.5,0.5c0.391,0.391,1.023,0.391,1.414,0l0.5-0.5 C14.719,4.698,17.281,4.702,18.791,6.205z" />
-                  </svg>
-                </div>
-                <div className="pt-1">
-                  {product.sold ? (
-                    <p className="font-bold text-lg text-gray-500 line-through">
-                      R$ {product.price.toLocaleString("pt-BR")}
-                    </p>
-                  ) : (
-                    <PriceDisplay 
-                      price={product.price} 
-                      discount={product.discount}
-                      size="small"
-                    />
-                  )}
-                </div>
-                {product.sold && (
-                  <p className="text-sm text-red-600 font-semibold mt-1">
-                    Produto já vendido
-                  </p>
-                )}
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section className="bg-gray-50 py-8" id="sobre">
-        <div className="container py-8 px-6 mx-auto">
-          <a
-            className="uppercase tracking-wide no-underline hover:no-underline font-bold text-gray-800 text-xl mb-8"
-            href="#sobre"
-          >
-            Sobre
-          </a>
-
-          <p className="mt-8 mb-8">
-            Estou me mudando de casa e preciso vender alguns móveis e
-            eletrodomésticos que não vou levar comigo. Todos os produtos estão em
-            excelente estado de conservação e foram bem cuidados.
-            <br />
-            <br />
-            Para mais informações, fotos adicionais ou para agendar uma visita,
-            entre em contato via WhatsApp. Aceito negociação em compras múltiplas!
-          </p>
+          <ProductGrid initialProducts={products} />
         </div>
       </section>
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { slugify, generateUniqueSlug } from '@/lib/slugify';
 
 export async function GET() {
   try {
@@ -32,13 +33,41 @@ export async function POST(request: NextRequest) {
     
     const body = await request.json();
     
+    // Gera slug baseado no nome do produto
+    const baseSlug = slugify(body.name);
+    
+    // Busca todos os slugs existentes para garantir unicidade
+    const existingProducts = await db
+      .collection('products')
+      .find({}, { projection: { slug: 1 } })
+      .toArray();
+    
+    const existingSlugs = existingProducts.map(p => p.slug).filter(Boolean);
+    const uniqueSlug = generateUniqueSlug(baseSlug, existingSlugs);
+    
     const product = {
       ...body,
+      slug: uniqueSlug,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
     const result = await db.collection('products').insertOne(product);
+
+    // Revalida o cache da home (lista de produtos)
+    try {
+      const revalidateUrl = new URL('/api/revalidate', request.url);
+      await fetch(revalidateUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'home',
+          secret: process.env.REVALIDATE_SECRET,
+        }),
+      });
+    } catch (revalidateError) {
+      console.warn('Failed to revalidate cache:', revalidateError);
+    }
 
     return NextResponse.json({ 
       success: true, 

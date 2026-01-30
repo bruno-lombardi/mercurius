@@ -49,3 +49,49 @@ export async function getProductById(id: string): Promise<Product | null> {
     return null;
   }
 }
+
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  try {
+    const client = await clientPromise;
+    const db = client.db('mercurius');
+    
+    // Busca por slug
+    const product = await db
+      .collection('products')
+      .findOne({ slug });
+
+    if (!product) {
+      return null;
+    }
+
+    return {
+      ...product,
+      _id: product._id.toString(),
+      image: product.images?.[0], // Primeiro imagem como principal
+    } as Product;
+  } catch (error) {
+    console.error('Error fetching product by slug:', error);
+    return null;
+  }
+}
+
+export async function checkSlugExists(slug: string, excludeId?: string): Promise<boolean> {
+  try {
+    const client = await clientPromise;
+    const db = client.db('mercurius');
+    
+    const query: { slug: string; _id?: { $ne: ObjectId } } = { slug };
+    if (excludeId) {
+      query._id = { $ne: new ObjectId(excludeId) };
+    }
+    
+    const product = await db
+      .collection('products')
+      .findOne(query);
+
+    return product !== null;
+  } catch (error) {
+    console.error('Error checking slug:', error);
+    return false;
+  }
+}

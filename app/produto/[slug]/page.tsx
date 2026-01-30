@@ -6,18 +6,19 @@ import Footer from "@/app/components/Footer";
 import PriceDisplay from "@/app/components/PriceDisplay";
 import ImageCarousel from "@/app/components/ImageCarousel";
 import PickupLocationMap from "@/app/components/PickupLocationMap";
-import { getProductById, getProducts } from "@/lib/products";
+import { getProductBySlug, getProducts } from "@/lib/products";
 import type { Metadata } from "next";
 
-export const dynamic = 'force-dynamic';
+// Revalida a cada 60 segundos (ISR)
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
-  const product = await getProductById(id);
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     return {
@@ -28,23 +29,28 @@ export async function generateMetadata({
   return {
     title: `${product.name} - R$ ${product.price.toLocaleString("pt-BR")}`,
     description: product.description,
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      images: [product.images[0]],
+    },
   };
 }
 
 export async function generateStaticParams() {
   const products = await getProducts();
   return products.map((product) => ({
-    id: product._id,
+    slug: product.slug,
   }));
 }
 
 export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = await params;
-  const product = await getProductById(id);
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     notFound();
@@ -250,7 +256,7 @@ export default async function ProductPage({
                 key={relatedProduct._id}
                 className="w-full md:w-1/3 px-4 mb-8"
               >
-                <Link href={`/produto/${relatedProduct._id}`}>
+                <Link href={`/produto/${relatedProduct.slug}`}>
                   <div className="relative rounded-lg overflow-hidden">
                     <Image
                       src={relatedProduct.image || relatedProduct.images[0]}

@@ -1,6 +1,7 @@
 export interface Product {
   _id?: string;
   name: string;
+  slug: string; // URL-friendly version do nome
   price: number;
   discount?: number; // Desconto em porcentagem (0-100)
   description: string;

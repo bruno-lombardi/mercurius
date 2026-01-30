@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { slugify, generateUniqueSlug } from '@/lib/slugify';
 
 export async function GET(
   request: NextRequest,
@@ -47,8 +48,33 @@ export async function PUT(
     
     const body = await request.json();
     
+    // Se o nome foi alterado, atualiza o slug
+    const currentProduct = await db
+      .collection('products')
+      .findOne({ _id: new ObjectId(id) });
+    
+    let slug = currentProduct?.slug;
+    
+    // Se o nome mudou ou não existe slug, gera um novo
+    if (!slug || body.name !== currentProduct?.name) {
+      const baseSlug = slugify(body.name);
+      
+      // Busca slugs existentes (excluindo o produto atual)
+      const existingProducts = await db
+        .collection('products')
+        .find(
+          { _id: { $ne: new ObjectId(id) } },
+          { projection: { slug: 1 } }
+        )
+        .toArray();
+      
+      const existingSlugs = existingProducts.map(p => p.slug).filter(Boolean);
+      slug = generateUniqueSlug(baseSlug, existingSlugs);
+    }
+    
     const updateData = {
       ...body,
+      slug,
       updatedAt: new Date(),
     };
 
@@ -66,9 +92,27 @@ export async function PUT(
       );
     }
 
+    // Revalida o cache do Next.js (on-demand revalidation)
+    try {
+      const revalidateUrl = new URL('/api/revalidate', request.url);
+      await fetch(revalidateUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'product',
+          slug: slug,
+          secret: process.env.REVALIDATE_SECRET,
+        }),
+      });
+    } catch (revalidateError) {
+      // Não falha a requisição se a revalidação falhar
+      console.warn('Failed to revalidate cache:', revalidateError);
+    }
+
     return NextResponse.json({ 
       success: true, 
-      message: 'Product updated successfully' 
+      message: 'Product updated successfully',
+      slug: slug,
     });
   } catch (error) {
     console.error('Error updating product:', error);
@@ -141,6 +185,11 @@ export async function DELETE(
     const client = await clientPromise;
     const db = client.db('mercurius');
     
+    // Busca o produto antes de deletar para pegar o slug
+    const product = await db
+      .collection('products')
+      .findOne({ _id: new ObjectId(id) });
+    
     const result = await db
       .collection('products')
       .deleteOne({ _id: new ObjectId(id) });
@@ -150,6 +199,22 @@ export async function DELETE(
         { success: false, error: 'Product not found' },
         { status: 404 }
       );
+    }
+
+    // Revalida o cache (home e página do produto)
+    try {
+      const revalidateUrl = new URL('/api/revalidate', request.url);
+      await fetch(revalidateUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'product',
+          slug: product?.slug,
+          secret: process.env.REVALIDATE_SECRET,
+        }),
+      });
+    } catch (revalidateError) {
+      console.warn('Failed to revalidate cache:', revalidateError);
     }
 
     return NextResponse.json({ 
