@@ -7,13 +7,13 @@ export default function Footer() {
   const { data: session } = useSession();
 
   return (
-    <footer className=" bg-white py-8 border-t border-gray-400">
+    <footer id="sobre" className="bg-white border-gray-400">
       <div className="flex justify-center">
         <div className="container flex px-6 py-8">
           <div className="w-full mx-auto flex flex-wrap">
             <div className="flex w-full lg:w-1/2">
               <div className="px-3 md:px-0">
-                <h3 className="font-bold text-gray-900">Sobre</h3>
+                <h3 className="font-bold text-gray-900 text-xl">Sobre</h3>
                 <p className="py-4">
                   Estou vendendo alguns móveis e eletrodomésticos. Todos os
                   itens estão em excelente estado de conservação. Entre em
@@ -48,7 +48,7 @@ export default function Footer() {
       </div>
 
       {/* Admin Button */}
-      <div className="border-t border-gray-200 pt-6 mt-4">
+      <div className="border-t border-gray-200 py-6 mt-4">
         <div className="container mx-auto px-6 flex justify-center">
           <Link
             href={session ? "/admin/dashboard" : "/admin/login"}

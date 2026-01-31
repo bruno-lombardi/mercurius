@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { shimmer, toBase64 } from "@/lib/image";
 
 interface ImageCarouselProps {
   images: string[];
@@ -66,6 +67,8 @@ export default function ImageCarousel({ images, productName }: ImageCarouselProp
     );
   };
 
+  const shimmerData = toBase64(shimmer(800, 800));
+
   return (
     <div className="relative">
       {/* Main Image */}
@@ -81,6 +84,10 @@ export default function ImageCarousel({ images, productName }: ImageCarouselProp
           height={800}
           className="w-full h-full object-cover"
           priority={currentIndex === 0}
+          placeholder="blur"
+          blurDataURL={`data:image/svg+xml;base64,${shimmerData}`}
+          loading={currentIndex === 0 ? "eager" : "lazy"}
+          sizes="(max-width: 640px) 100vw, 50vw"
         />
         
         {/* Zoom Hint */}
@@ -163,6 +170,10 @@ export default function ImageCarousel({ images, productName }: ImageCarouselProp
                 width={80}
                 height={80}
                 className="w-full h-full object-cover"
+                placeholder="blur"
+                blurDataURL={`data:image/svg+xml;base64,${shimmerData}`}
+                loading="lazy"
+                sizes="80px"
               />
             </button>
           ))}
@@ -218,6 +229,10 @@ export default function ImageCarousel({ images, productName }: ImageCarouselProp
               height={1200}
               className="max-w-full max-h-full object-contain"
               onClick={(e) => e.stopPropagation()}
+              placeholder="blur"
+              blurDataURL={`data:image/svg+xml;base64,${shimmerData}`}
+              loading="eager"
+              sizes="(max-width: 1024px) 100vw, 1200px"
             />
           </div>
 

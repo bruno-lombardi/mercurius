@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { shimmer, toBase64 } from "@/lib/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/app/components/Header";
@@ -259,13 +260,17 @@ export default async function ProductPage({
                 <Link href={`/produto/${relatedProduct.slug}`}>
                   <div className="relative rounded-lg overflow-hidden">
                     <Image
-                      src={relatedProduct.image || relatedProduct.images[0]}
-                      alt={relatedProduct.name}
-                      width={400}
-                      height={400}
-                      className="hover:scale-105 transition-all duration-300"
-                      style={{ objectFit: "cover", aspectRatio: "1/1" }}
-                    />
+                          src={relatedProduct.image || relatedProduct.images[0]}
+                          alt={relatedProduct.name}
+                          width={400}
+                          height={400}
+                          className="hover:scale-105 transition-all duration-300"
+                          style={{ objectFit: "cover", aspectRatio: "1/1" }}
+                          placeholder="blur"
+                          blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(400,400))}`}
+                          loading="lazy"
+                          sizes="(max-width: 640px) 100vw, 33vw"
+                        />
                   </div>
                   <div className="pt-3">
                     <p className="text-gray-900 font-semibold">

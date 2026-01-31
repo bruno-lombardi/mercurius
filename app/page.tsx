@@ -66,10 +66,10 @@ export default async function Home() {
       </section>
 
       {/* Pickup Location Banner */}
-      <section className="bg-white py-8 border-t border-gray-200">
+      <section className="bg-white py-4 border-t border-gray-200">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl">
-            <h2 className="text-xl font-bold text-gray-900 mb-3">
+            <h2 className="font-bold text-gray-900 mb-3">
               Informações de Retirada
             </h2>
             <div className="flex items-center gap-2 text-gray-700 mb-2">

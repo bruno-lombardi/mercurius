@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { shimmer, toBase64 } from "@/lib/image";
 import Link from "next/link";
 import PriceDisplay from "./PriceDisplay";
 import ProductFilters, { filterAndSortProducts, type FilterState } from "./ProductFilters";
@@ -87,6 +88,10 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
                     width={400}
                     height={400}
                     style={{ objectFit: "cover", aspectRatio: "1/1" }}
+                    placeholder="blur"
+                    blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(400,400))}`}
+                    loading="lazy"
+                    sizes="(max-width: 640px) 100vw, 25vw"
                   />
                   <span className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-xs font-semibold text-gray-700">
                     {product.category}

@@ -332,7 +332,7 @@ export default async function DashboardPage() {
                         Editar
                       </Link>
                       <Link
-                        href={`/produto/${product._id}`}
+                        href={`/produto/${product.slug}`}
                         target="_blank"
                         className="flex-1 inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors duration-200"
                       >
@@ -447,7 +447,7 @@ export default async function DashboardPage() {
                           Editar
                         </Link>
                         <Link
-                          href={`/produto/${product._id}`}
+                          href={`/produto/${product.slug}`}
                           target="_blank"
                           className="inline-flex items-center text-neutral-700 hover:text-neutral-900 transition-colors duration-200"
                         >
