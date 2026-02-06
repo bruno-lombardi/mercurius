@@ -11,8 +11,12 @@ export default function PriceDisplay({
   size = 'medium',
   className = '' 
 }: PriceDisplayProps) {
-  const hasDiscount = discount && discount > 0;
-  const finalPrice = hasDiscount ? price * (1 - discount / 100) : price;
+  const hasDiscount = typeof discount === 'number' && discount > 0;
+  const finalPrice = hasDiscount ? price * (1 - discount! / 100) : price;
+
+  const discountStr = hasDiscount
+    ? new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2, minimumFractionDigits: 0 }).format(discount!)
+    : null;
 
   const sizeClasses = {
     small: {
@@ -36,9 +40,9 @@ export default function PriceDisplay({
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      {hasDiscount && (
+      {hasDiscount && discountStr && (
         <span className={`bg-green-500 text-white font-bold rounded ${classes.discount}`}>
-          -{discount}%
+          -{discountStr}%
         </span>
       )}
       

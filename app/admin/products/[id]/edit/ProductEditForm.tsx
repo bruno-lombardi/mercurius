@@ -15,6 +15,7 @@ export default function ProductEditForm({ productId }: { productId: string }) {
   const [images, setImages] = useState<string[]>([]);
   const [previewPrice, setPreviewPrice] = useState<number>(0);
   const [previewDiscount, setPreviewDiscount] = useState<number>(0);
+  const [previewDiscountStr, setPreviewDiscountStr] = useState<string>("");
 
   useEffect(() => {
     async function loadProduct() {
@@ -31,6 +32,11 @@ export default function ProductEditForm({ productId }: { productId: string }) {
         setImages(data.data.images || []);
         setPreviewPrice(data.data.price || 0);
         setPreviewDiscount(data.data.discount || 0);
+        setPreviewDiscountStr(
+          data.data.discount != null && data.data.discount !== 0
+            ? new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(data.data.discount)
+            : ""
+        );
       } catch (err) {
         console.error(err);
         setError("Erro ao carregar produto");
@@ -50,10 +56,32 @@ export default function ProductEditForm({ productId }: { productId: string }) {
 
     const formData = new FormData(event.currentTarget);
 
+    // Normalize discount: input uses pt-BR format (comma as decimal separator)
+    const rawDiscount = formData.get("discount");
+    let normalizedDiscount: number | null | undefined = undefined;
+    if (rawDiscount === "") {
+      // user cleared the field -> explicit remove
+      normalizedDiscount = null;
+    } else if (rawDiscount == null) {
+      normalizedDiscount = undefined;
+    } else {
+      // convert comma to dot for parsing
+      const rawStr = (rawDiscount as string).replace(/\./g, '').replace(',', '.');
+      const parsed = parseFloat(rawStr);
+      if (isNaN(parsed) || parsed <= 0) {
+        // treat 0 or invalid as remove
+        normalizedDiscount = null;
+      } else {
+  // clamp to allowed range and round to 2 decimals
+  const bounded = Math.round(Math.min(100, Math.max(0.5, parsed)) * 100) / 100;
+  normalizedDiscount = bounded;
+      }
+    }
+
     const updatedProduct = {
       name: formData.get("name") as string,
       price: parseFloat(formData.get("price") as string),
-      discount: formData.get("discount") ? parseFloat(formData.get("discount") as string) : undefined,
+      discount: normalizedDiscount,
       description: formData.get("description") as string,
       category: formData.get("category") as string,
       condition: formData.get("condition") as string,
@@ -209,19 +237,40 @@ export default function ProductEditForm({ productId }: { productId: string }) {
                     Desconto (%)
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     id="discount"
                     name="discount"
-                    min="0"
-                    max="100"
-                    step="1"
-                    defaultValue={product.discount || ""}
+                    inputMode="decimal"
+                    value={previewDiscountStr}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      setPreviewDiscount(value === '' ? 0 : parseFloat(value) || 0);
+                      // Allow digits, dots and commas; normalize to show comma
+                      let v = e.target.value.replace(/[^0-9,\.]/g, '');
+                      // replace dots with comma, but allow grouping dots removal
+                      v = v.replace(/\./g, ',');
+                      // limit to one comma
+                      const parts = v.split(',');
+                      if (parts.length > 2) {
+                        v = parts[0] + ',' + parts.slice(1).join('').slice(0,2);
+                      }
+                      // limit decimals to 2
+                      if (v.includes(',')) {
+                        const [intPart, decPart] = v.split(',');
+                        v = intPart + ',' + (decPart || '').slice(0,2);
+                      }
+                      setPreviewDiscountStr(v);
+
+                      // parse to number for preview
+                      const normalized = v.replace(/\./g, '').replace(',', '.');
+                      const parsed = parseFloat(normalized);
+                      if (isNaN(parsed) || parsed <= 0) {
+                        setPreviewDiscount(0);
+                      } else {
+                        const bounded = Math.round(Math.min(100, Math.max(0.5, parsed)) * 100) / 100;
+                        setPreviewDiscount(bounded);
+                      }
                     }}
                     className="block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors"
-                    placeholder="0"
+                    placeholder="0,00"
                   />
                   <p className="mt-1 text-xs text-neutral-500">Deixe em branco para nenhum desconto</p>
                 </div>

@@ -72,17 +72,31 @@ export async function PUT(
       slug = generateUniqueSlug(baseSlug, existingSlugs);
     }
     
-    const updateData = {
-      ...body,
-      slug,
-      updatedAt: new Date(),
-    };
+    // Prepare $set and $unset operations so that clients can explicitly clear fields by sending null
+  const setOps: Record<string, unknown> = {};
+  const unsetOps: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(body)) {
+      if (value === null) {
+        unsetOps[key] = "";
+      } else {
+        setOps[key] = value;
+      }
+    }
+
+    // Ensure slug and updatedAt are applied via $set
+    setOps.slug = slug;
+    setOps.updatedAt = new Date();
+
+  const updateQuery: Record<string, unknown> = {};
+    if (Object.keys(setOps).length > 0) updateQuery.$set = setOps;
+    if (Object.keys(unsetOps).length > 0) updateQuery.$unset = unsetOps;
 
     const result = await db
       .collection('products')
       .updateOne(
         { _id: new ObjectId(id) },
-        { $set: updateData }
+        updateQuery
       );
 
     if (result.matchedCount === 0) {
@@ -137,17 +151,31 @@ export async function PATCH(
     // Remove _id do body se existir
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, ...updateData } = body;
-    
+
+    // Support explicit null to unset fields (e.g., discount)
+    const setOps: Record<string, unknown> = {};
+    const unsetOps: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(updateData)) {
+      if (value === null) {
+        unsetOps[key] = "";
+      } else {
+        setOps[key] = value;
+      }
+    }
+
+    // always update timestamp
+    setOps.updatedAt = new Date();
+
+    const updateQuery: Record<string, unknown> = {};
+    if (Object.keys(setOps).length > 0) updateQuery.$set = setOps;
+    if (Object.keys(unsetOps).length > 0) updateQuery.$unset = unsetOps;
+
     const result = await db
       .collection('products')
       .updateOne(
         { _id: new ObjectId(id) },
-        { 
-          $set: {
-            ...updateData,
-            updatedAt: new Date(),
-          }
-        }
+        updateQuery
       );
 
     if (result.matchedCount === 0) {
