@@ -129,16 +129,14 @@ export default async function ProductPage({
             </h1>
 
             <div className="mb-6">
-              {product.sold ? (
-                <span className="text-4xl font-bold text-gray-500 line-through">
-                  R$ {product.price.toLocaleString("pt-BR")}
-                </span>
-              ) : (
-                <PriceDisplay 
-                  price={product.price} 
-                  discount={product.discount}
-                  size="large"
-                />
+              <PriceDisplay 
+                price={product.price} 
+                discount={product.discount}
+                size="large"
+                sold={product.sold}
+              />
+              {!product.sold && (
+                <p className="text-sm text-gray-400 mt-1">Preço válido para pagamento via PIX ou dinheiro</p>
               )}
             </div>
 

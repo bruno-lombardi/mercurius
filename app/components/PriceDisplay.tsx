@@ -2,6 +2,7 @@ interface PriceDisplayProps {
   price: number;
   discount?: number;
   size?: 'small' | 'medium' | 'large';
+  sold?: boolean;
   className?: string;
 }
 
@@ -9,6 +10,7 @@ export default function PriceDisplay({
   price, 
   discount, 
   size = 'medium',
+  sold = false,
   className = '' 
 }: PriceDisplayProps) {
   const hasDiscount = typeof discount === 'number' && discount > 0;
@@ -40,18 +42,18 @@ export default function PriceDisplay({
 
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      {hasDiscount && discountStr && (
+      {hasDiscount && discountStr && !sold && (
         <span className={`bg-green-500 text-white font-bold rounded ${classes.discount}`}>
           -{discountStr}%
         </span>
       )}
       
       <div className="flex flex-col">
-        <span className={`font-bold text-neutral-900 ${classes.final}`}>
+        <span className={`font-bold ${sold ? 'text-gray-500' : 'text-neutral-900'} ${classes.final}`}>
           R$ {finalPrice.toFixed(2).replace('.', ',')}
         </span>
         
-        {hasDiscount && (
+        {hasDiscount && !sold && (
           <span className={`text-neutral-500 line-through ${classes.original}`}>
             R$ {price.toFixed(2).replace('.', ',')}
           </span>

@@ -121,17 +121,12 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
                   </svg>
                 </div>
                 <div className="pt-1">
-                  {product.sold ? (
-                    <p className="font-bold text-lg text-gray-500 line-through">
-                      R$ {product.price.toLocaleString("pt-BR")}
-                    </p>
-                  ) : (
-                    <PriceDisplay
-                      price={product.price}
-                      discount={product.discount}
-                      size="small"
-                    />
-                  )}
+                  <PriceDisplay
+                    price={product.price}
+                    discount={product.discount}
+                    size="small"
+                    sold={product.sold}
+                  />
                 </div>
                 {product.sold && (
                   <p className="text-sm text-red-600 font-semibold mt-1">
