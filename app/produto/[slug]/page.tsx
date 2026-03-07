@@ -128,17 +128,16 @@ export default async function ProductPage({
               {product.name}
             </h1>
 
-            <div className="mb-6">
-              <PriceDisplay 
-                price={product.price} 
-                discount={product.discount}
-                size="large"
-                sold={product.sold}
-              />
-              {!product.sold && (
+            {!product.sold && (
+              <div className="mb-6">
+                <PriceDisplay 
+                  price={product.price} 
+                  discount={product.discount}
+                  size="large"
+                />
                 <p className="text-sm text-gray-400 mt-1">Preço válido para pagamento via PIX ou dinheiro</p>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="mb-6">
               <div className="flex items-center mb-2">
